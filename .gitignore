@@ -48,7 +48,16 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 
+# testing files
+
 plots/nyccas_map_selfcontained-TRUE_files
 plots/nyccas_map_selfcontained-FALSE_files
 plots/nyccas_map_selfcontained-FALSE.html
 plots/nyccas_map_selfcontained-TRUE.html
+
+# notebook output
+
+code/_1_example.html
+code/_2_choropleth.html
+code/_3_raster.html
+code/_4_light_pollution.html
