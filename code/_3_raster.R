@@ -1,42 +1,18 @@
----
-title: "3. Raster - advanced"
-output:
-  html_document:
-    df_print: paged
----
+###########################################################################################-
+###########################################################################################-
+##
+## 3. Raster - advanced ----
+##
+###########################################################################################-
+###########################################################################################-
 
-# Setting up
+#=========================================================================================#
+# Setting up ----
+#=========================================================================================#
 
-<!-- install packages -->
-
-```{r, echo = FALSE}
-
-# These are the packages you already have
-
-packages_you_have <- installed.packages()[, "Package"]
-
-# These are all the packages we'll use
-
-packages_we_use <- c("jsonlite", "dplyr", "tibble", "tidyr", "leaflet", "leaflet.extras", "leafem", "terra", "stars", "geojsonio", "sf", "viridisLite", "here", "htmlwidgets", "htmltools", "conflicted")
-
-# These are the packages you need to install
-
-packages_you_need <- packages_we_use[!packages_we_use %in% packages_you_have]
-
-# This will install the packages you don't already have
-
-if (length(packages_you_need)) {
-    
-    cat("Installing:", paste(packages_you_need, collapse = ", "))
-    
-    install.packages(packages_you_need)
-}
-
-```
-
-## Load packages
-
-```{r, echo = TRUE, warning = FALSE, message = FALSE}
+#-----------------------------------------------------------------------------------------#
+# Loading libraries
+#-----------------------------------------------------------------------------------------#
 
 library(jsonlite)
 library(dplyr)
@@ -58,27 +34,22 @@ library(conflicted)
 conflict_prefer("filter", "dplyr")
 conflict_prefer("select", "dplyr")
 
-```
+#-----------------------------------------------------------------------------------------#
+# modifications of {leaflet} functions
+#-----------------------------------------------------------------------------------------#
 
-
-## Modified reset button
-
-`leaflet.extras::addResetMapButton` but allowing specification of position
-
-```{r}
+# `leaflet.extras::addResetMapButton` but allowing specification of position
 
 source(here("code/functions/addResetMapButtonPosition.R"))
 
-```
 
+#-----------------------------------------------------------------------------------------#
+# Loading data -----
+#-----------------------------------------------------------------------------------------#
 
-# Load and process data
-
-## First get boro boundaries
-
-We'll crop the raster to show only Queens
-
-```{r}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# border for boro
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 
 base_url <- "https://raw.githubusercontent.com/nychealth/EHDP-data/production/"
 
@@ -90,16 +61,15 @@ queens_border <-
     pull(geometry) %>% 
     vect()
 
-```
 
-## Load and crop NYCCAS raster
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# NYCCAS rasters
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 
-*predicted annual average fine particulate matter <2.5 microns, Dec 2020-Dec 2021*  
-*units: ug/m3*
+# predicted annual average fine particulate matter <2.5 microns, Dec 2020-Dec 2021
+# units: ug/m3
 
-Downloaded from [NYC Open Data](https://data.cityofnewyork.us/Environment/NYCCAS-Air-Pollution-Rasters/q68s-8qxv/about_data).  
-
-```{r}
+# downloaded from https://data.cityofnewyork.us/Environment/NYCCAS-Air-Pollution-Rasters/q68s-8qxv/about_data
 
 nyccas_pm25_qns_stars <- 
     rast(here("data/NYCCAS/AnnAvg1_13_300mRaster/aa13_pm300m")) %>%
@@ -114,14 +84,14 @@ nyccas_pm25_qns_stars <-
     
     st_set_crs(value = st_crs(4326))
 
-```
 
-# Constructing the map
+#=========================================================================================#
+# Mapping ----
+#=========================================================================================#
 
-We'll first initialize the map, then add tiles[^1], add the NYCCAS raster, add a map control, add an image query that tells us the raster value under the mouse pointer, and finish by adding the custom reset button.
-
-
-```{r}
+#-----------------------------------------------------------------------------------------#
+# Constructing map
+#-----------------------------------------------------------------------------------------#
 
 nyccas_map <- 
     
@@ -207,17 +177,13 @@ nyccas_map <-
 
 nyccas_map 
 
-```
+#-----------------------------------------------------------------------------------------#
+# Saving map ----
+#-----------------------------------------------------------------------------------------#
 
-# Save the map
-
-We'll save 2 different versions: self-contained, and non-self-contained
-
-## Self-contained
-
-In this version, all the data and dependencies are included in-line in the single HTML output file.
-
-```{r}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# Self-contained
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 
 saveWidget(
     widget = nyccas_map,
@@ -226,15 +192,9 @@ saveWidget(
     title = "NYCCAS PM2.5 2022 Queens"
 )
 
-```
-
-The self-contained version can get pretty big, but you don't have to worry about anything except that 1 output file.
-
-## Non-self-contained
-
-Here, the data and dependencies are put into folders, which the HTML will point to.
-
-```{r}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# Non-self-contained
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 
 saveWidget(
     widget = nyccas_map,
@@ -243,7 +203,11 @@ saveWidget(
     title = "NYCCAS PM2.5 2022 Queens"
 )
 
-```
 
-
-[^1]: You can check out the provider tiles with the [Leaflet-providers preview](https://leaflet-extras.github.io/leaflet-providers/preview/)
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# #
+# #                             ---- THIS IS THE END! ----
+# #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
