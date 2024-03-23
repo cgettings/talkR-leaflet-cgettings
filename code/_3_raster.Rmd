@@ -1,0 +1,250 @@
+---
+title: "3. Raster - advanced"
+output:
+  html_document:
+    df_print: paged
+---
+
+# Setting up
+
+<!-- install packages -->
+
+```{r, echo = FALSE}
+
+# These are the packages you already have
+
+packages_you_have <- installed.packages()[, "Package"]
+
+# These are all the packages we'll use
+
+packages_we_use <- c("jsonlite", "dplyr", "tibble", "tidyr", "leaflet", "leaflet.extras", "leafem", "terra", "stars", "geojsonio", "sf", "viridisLite", "here", "htmlwidgets", "htmltools", "conflicted")
+
+# These are the packages you need to install
+
+packages_you_need <- packages_we_use[!packages_we_use %in% packages_you_have]
+
+# This will install the packages you don't already have
+
+if (length(packages_you_need)) {
+    
+    cat("Installing:", paste(packages_you_need, collapse = ", "))
+    
+    install.packages(packages_you_need)
+}
+
+```
+
+## Load packages
+
+```{r, echo = TRUE, warning = FALSE, message = FALSE}
+
+library(jsonlite)
+library(dplyr)
+library(tibble)
+library(tidyr)
+library(leaflet)
+library(leaflet.extras)
+library(leafem)
+library(terra)
+library(stars)
+library(geojsonio)
+library(sf)
+library(viridisLite)
+library(here)
+library(htmlwidgets)
+library(htmltools)
+library(conflicted)
+
+conflict_prefer("filter", "dplyr")
+conflict_prefer("select", "dplyr")
+
+```
+
+
+## Modified reset button
+
+`leaflet.extras::addResetMapButton` but allowing specification of position
+
+```{r}
+
+source(here("code/functions/addResetMapButtonPosition.R"))
+
+```
+
+
+
+# Load and process data
+
+## First get boro boundaries
+
+We'll crop the raster to show only Queens
+
+```{r}
+
+base_url <- "https://raw.githubusercontent.com/nychealth/EHDP-data/production/"
+
+queens_border <- 
+    topojson_read(paste0(base_url, "geography/borough.topo.json"), crs = 4326) %>% 
+    as_tibble() %>% 
+    st_as_sf() %>% 
+    filter(name == "Queens") %>% 
+    pull(geometry) %>% 
+    vect()
+
+```
+
+## Load and crop NYCCAS raster
+
+*predicted annual average fine particulate matter <2.5 microns, Dec 2020-Dec 2021*  
+*units: ug/m3*
+
+Downloaded from [NYC Open Data](https://data.cityofnewyork.us/Environment/NYCCAS-Air-Pollution-Rasters/q68s-8qxv/about_data).  
+
+```{r}
+
+nyccas_pm25_qns_stars <- 
+    rast(here("data/NYCCAS/AnnAvg1_13_300mRaster/aa13_pm300m")) %>%
+    project("epsg:4326") %>% 
+    crop(queens_border, mask = TRUE) %>% 
+        
+    # transforming to stars object, to make adding to leaflet easier
+    
+    st_as_stars() %>%
+    
+    # re-setting CRS to original data
+    
+    st_set_crs(value = st_crs(4326))
+
+```
+
+# Constructing the map
+
+We'll first initialize the map, then add tiles[^1], add the NYCCAS raster, add a map control, add an image query that tells us the raster value under the mouse pointer, and finish by adding the custom reset button.
+
+
+```{r}
+
+nyccas_map <- 
+    
+    # initialize
+    
+    leaflet() %>%
+    
+    # enable browser tile caching, to speed up the map
+    
+    enableTileCaching() %>%
+    
+    # add tiles in groups, which we'll use for the tile layer switcher
+    
+    addProviderTiles(
+        providers$Stadia.AlidadeSmoothDark, 
+        group = "Dark", 
+        options = providerTileOptions(zIndex = -1000)
+    ) %>%
+    addProviderTiles(
+        providers$Stadia.StamenTonerLite, 
+        group = "Light", 
+        options = providerTileOptions(zIndex = -1000)
+    ) %>%
+    addProviderTiles(
+        providers$CartoDB.Voyager, 
+        group = "Streets", 
+        options = providerTileOptions(zIndex = -1000)
+    ) %>%
+    
+    # NYCCAS_pm25 raster
+    
+    # all the `group` and `layerId` arguments have to be the same to get the raster, image query, and layers control to work (as far as I can tell)
+    
+    addGeoRaster(
+        x = nyccas_pm25_qns_stars,
+        group = "NYCCAS PM 2.5",
+        layerId = "NYCCAS PM 2.5",
+        resolution = 64,
+        project = TRUE,
+        colorOptions =
+            colorOptions(
+                palette = inferno(64, direction = 1),
+                na.color = "#00000000"
+            ),
+        
+        # options that reduce overhead while rendering the raster into tiles
+        options =
+            tileOptions(
+                zIndex = 1000,
+                updateWhenZooming = FALSE,
+                updateWhenIdle = TRUE
+            )
+    ) %>%
+    
+    # adding controls
+    
+    addLayersControl(
+        baseGroups = c("Dark", "Light", "Streets"),
+        overlayGroups = "NYCCAS PM 2.5",
+        options = layersControlOptions(collapsed = FALSE, autoZIndex = FALSE),
+        position = "topright"
+    ) %>%
+    
+    # raster mouseover values (put this after layers control for better positioning on map)
+    
+    addImageQuery(
+        x = nyccas_pm25_qns_stars,
+        group = "NYCCAS PM 2.5",
+        layerId = "NYCCAS PM 2.5",
+        position = "topright",
+        digits = 2,
+        type = "mousemove",
+        prefix = "",
+        project = TRUE
+    ) %>%
+    
+    # reset buttons
+    
+    addResetMapButtonPosition(position = "bottomleft")
+
+
+# now print the map
+
+nyccas_map 
+
+```
+
+# Save the map
+
+We'll save 2 different versions: self-contained, and non-self-contained
+
+## Self-contained
+
+In this version, all the data and dependencies are included in-line in the single HTML output file.
+
+```{r}
+
+saveWidget(
+    widget = nyccas_map,
+    file = here("output/nyccas_map_self-contained.html"),
+    selfcontained = TRUE,
+    title = "NYCCAS PM2.5 2022 Queens"
+)
+
+```
+
+The self-contained version can get pretty big, but you don't have to worry about anything except that 1 output file.
+
+## Non-self-contained
+
+Here, the data and dependencies are put into folders, which the HTML will point to.
+
+```{r}
+
+saveWidget(
+    widget = nyccas_map,
+    file = here("output/nyccas_map_non-self-contained.html"),
+    selfcontained = FALSE,
+    title = "NYCCAS PM2.5 2022 Queens"
+)
+
+```
+
+
+[^1]: You can check out the provider tiles with the [Leaflet-providers preview](https://leaflet-extras.github.io/leaflet-providers/preview/)
