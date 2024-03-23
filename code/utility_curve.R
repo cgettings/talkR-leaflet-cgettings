@@ -1,0 +1,34 @@
+library(tibble)
+library(ggplot2)
+
+# fake data
+
+utility_curve <- 
+    tibble(
+        time = c(0L, 1L, 2L, 3L, 4L, 5L, 6L),
+        utility = c(0L, 7L, 12L, 15L, 16L, 15L, 12L)
+    )
+
+# real plot
+
+you_are_here <- 
+    utility_curve %>% 
+    ggplot(aes(time, utility)) + 
+    geom_smooth(color = "black") + 
+    geom_point(data = NULL, aes(x = 5.5, y = 14.5), shape = "|", color = "red", size = 7, stroke = 3) +
+    geom_text(data = NULL, aes(x = 5.5, y = 15.5), label = "Me", size = 5) +
+    labs(x = "Time spent", y = "Actual value added") +
+    theme_bw() +
+    theme(axis.text = element_blank())
+
+print(you_are_here)
+
+# save me
+
+ggsave(
+    "code/talkR/plots/you_are_here.png",
+    you_are_here,
+    width = 8,
+    height = 5,
+    scale = 1.25
+)
