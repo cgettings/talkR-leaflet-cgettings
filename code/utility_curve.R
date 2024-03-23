@@ -26,7 +26,7 @@ print(you_are_here)
 # save me
 
 ggsave(
-    "code/talkR/plots/you_are_here.png",
+    here("plots/you_are_here.png"),
     you_are_here,
     width = 8,
     height = 5,
