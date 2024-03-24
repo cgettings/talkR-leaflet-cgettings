@@ -19,4 +19,3 @@ if (length(packages_you_need)) {
     
     install.packages(packages_you_need)
 }
-
