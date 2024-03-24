@@ -135,20 +135,22 @@ nyccas_map <-
     
     # add tiles in groups, which we'll use for the tile layer switcher
     
+    # zIndex = -1000 makes sure that the tiles are always the lowest layer
+    
     addProviderTiles(
-        providers$Stadia.AlidadeSmoothDark, 
-        group = "Dark", 
-        options = providerTileOptions(zIndex = -1000)
+        provider = providers$Stadia.AlidadeSmoothDark, 
+        options = providerTileOptions(zIndex = -1000),
+        group = "Dark"
     ) %>%
     addProviderTiles(
-        providers$Stadia.StamenTonerLite, 
-        group = "Light", 
-        options = providerTileOptions(zIndex = -1000)
+        provider = providers$Stadia.StamenTonerLite, 
+        options = providerTileOptions(zIndex = -1000),
+        group = "Light"
     ) %>%
     addProviderTiles(
-        providers$CartoDB.Voyager, 
-        group = "Streets", 
-        options = providerTileOptions(zIndex = -1000)
+        provider = providers$CartoDB.Voyager, 
+        options = providerTileOptions(zIndex = -1000),
+        group = "Streets"
     ) %>%
     
     # NYCCAS_pm25 raster
