@@ -61,3 +61,6 @@ code/_1_example.html
 code/_2_choropleth.html
 code/_3_raster.html
 code/_4_light_pollution.html
+code/js/closest_dark_place_orig.js
+code/Light_Pollution_Map_orig.R
+code/light_pollution.R
