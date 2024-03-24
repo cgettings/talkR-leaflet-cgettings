@@ -316,16 +316,41 @@ light_pollution_map <-
 
 # light_pollution_map
 
+#=========================================================================================#
+# Save the map ----
+#=========================================================================================#
+
+# We'll save 2 different versions: self-contained, and non-self-contained
+
 #-----------------------------------------------------------------------------------------#
-# Saving map
+# Self-contained
 #-----------------------------------------------------------------------------------------#
+
+# In this version, all the data and dependencies are included in-line in the single HTML output file.
+
+# The self-contained version can get pretty big, but you don't have to worry about anything except that 1 output file.
 
 saveWidget(
     widget = light_pollution_map,
-    file = here("output/light_pollution_map.html"),
-    selfcontained = TRUE,
+    file = here("output/light_pollution_map_self-contained.html"),
+    selfcontained = FALSE,
     title = "Light Pollution Map for New York"
 )
+
+
+#-----------------------------------------------------------------------------------------#
+# Non-self-contained
+#-----------------------------------------------------------------------------------------#
+
+# Here, the data and dependencies are put into folders, which the HTML will point to.
+
+saveWidget(
+    widget = light_pollution_map,
+    file = here("output/light_pollution_map_non-self-contained.html"),
+    selfcontained = FALSE,
+    title = "Light Pollution Map for New York"
+)
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
