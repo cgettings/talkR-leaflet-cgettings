@@ -84,3 +84,8 @@ code/highlight/tokyo-night-storm.theme
 code/highlight/tokyo-night.theme
 code/highlight/vscodium-dark.theme
 code/highlight/ayu-dark.theme
+
+# Microsoft temp files
+
+*~$*
+~*
