@@ -5,7 +5,7 @@ packages_you_have <- installed.packages()[, "Package"]
 
 # These are all the packages we'll use
 
-packages_we_use <- c("jsonlite", "dplyr", "tibble", "tidyr", "readr", "stringr", "leaflet", "leaflet.extras", "leafem", "terra", "stars", "geojsonio", "sf", "viridisLite", "here", "htmlwidgets", "htmltools", "conflicted")
+packages_we_use <- c("rmarkdown", "jsonlite", "dplyr", "tibble", "tidyr", "readr", "stringr", "leaflet", "leaflet.extras", "leafem", "terra", "stars", "geojsonio", "sf", "viridisLite", "here", "htmlwidgets", "htmltools", "conflicted")
 
 # These are the packages you need to install
 
