@@ -47,12 +47,12 @@ conflict_prefer("select", "dplyr")
 
 # `addResetMapButton` from `leaflet.extras`, but allowing specification of position
 
-source("code/functions/addResetMapButtonPosition.R")
+source(here("code/functions/addResetMapButtonPosition.R"))
 
 # `addEasyButton` from `leaflet`, but removing fontawesome dependency (so I can use the current 
 #   version)
 
-source("code/functions/addEasyButtonNoFaDeps.R")
+source(here("code/functions/addEasyButtonNoFaDeps.R"))
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 # plugins
