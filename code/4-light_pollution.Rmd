@@ -4,6 +4,7 @@ output:
   html_document:
     toc: yes
     theme: lumen
+    # highlight: tango
     highlight: highlight\atom-one-dark.theme
     df_print: paged
 ---
@@ -376,6 +377,8 @@ light_pollution_map <-
         ),
         data = sky_brightness_coords
     )
+
+light_pollution_map
 
 ```
 

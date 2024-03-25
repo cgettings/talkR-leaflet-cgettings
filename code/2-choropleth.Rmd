@@ -4,6 +4,7 @@ output:
   html_document: 
     toc: yes
     theme: lumen
+    # highlight: tango
     highlight: highlight\atom-one-dark.theme
     df_print: paged
 ---

@@ -4,11 +4,9 @@ output:
   html_document:
     toc: yes
     theme: lumen
+    # highlight: tango
     highlight: highlight\atom-one-dark.theme
     df_print: paged
-header-includes:
-   - \usepackage[default]{cascadia-code}
-   - \usepackage[T1]{fontenc}
 ---
 
 # Setting up
