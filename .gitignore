@@ -50,17 +50,37 @@ rsconnect/
 
 # testing files
 
-plots/nyccas_map_selfcontained-TRUE_files
-plots/nyccas_map_selfcontained-FALSE_files
-plots/nyccas_map_selfcontained-FALSE.html
-plots/nyccas_map_selfcontained-TRUE.html
 
 # notebook output
 
-code/_1_example.html
-code/_2_choropleth.html
-code/_3_raster.html
-code/_4_light_pollution.html
+code/*.html
 code/js/closest_dark_place_orig.js
 code/Light_Pollution_Map_orig.R
 code/light_pollution.R
+
+# syntax highlighting
+
+# code/highlight/atom-one-dark.theme
+code/highlight/ayu-dark.theme
+code/highlight/ayu-mirage.theme
+code/highlight/breeze-dark.theme
+code/highlight/catppuccin-frappe.theme
+code/highlight/catppuccin-latte.theme
+code/highlight/catppuccin-macchiato.theme
+code/highlight/catppuccin-mocha.theme
+code/highlight/dracula.theme
+code/highlight/falcon.theme
+code/highlight/github-dark.theme
+code/highlight/gruvbox-dark.theme
+code/highlight/homunculus.theme
+code/highlight/monokai.theme
+code/highlight/nord.theme
+code/highlight/oblivion.theme
+code/highlight/printing.theme
+code/highlight/radical.theme
+code/highlight/solarized-dark.theme
+code/highlight/tokyo-night-light.theme
+code/highlight/tokyo-night-storm.theme
+code/highlight/tokyo-night.theme
+code/highlight/vscodium-dark.theme
+code/highlight/ayu-dark.theme
