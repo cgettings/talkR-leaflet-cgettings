@@ -203,7 +203,7 @@ litter_baskets_map <-
     # initialize the map with the joined data and a nice view
     
     leaflet(litter_baskets) %>% 
-    setView(lng = -73.88, lat = 40.75, zoom = 11) %>% 
+    setView(lng = -73.88, lat = 40.75, zoom = 10) %>% 
     
     # add some nice low-key tiles
     
