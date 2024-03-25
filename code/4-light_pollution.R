@@ -1,7 +1,7 @@
 ###########################################################################################-
 ###########################################################################################-
 ##
-## 4. mapping light pollution - Very complicated: ----
+## 4. Light pollution - Very complicated ----
 ##
 ###########################################################################################-
 ###########################################################################################-
@@ -15,55 +15,47 @@
 #-----------------------------------------------------------------------------------------#
 
 library(jsonlite)
-library(terra)
-library(tidyverse)
-library(sf)
+library(dplyr)
+library(tibble)
+library(tidyr)
+library(readr)
+library(here)
+library(fs)
 library(leaflet)
 library(leaflet.extras)
 library(leafem)
+library(terra)
 library(stars)
+library(geojsonio)
+library(sf)
 library(viridisLite)
 library(htmlwidgets)
 library(htmltools)
-library(here)
-library(glue)
-library(tigris)
-library(fs)
+library(conflicted)
+
+conflict_prefer("filter", "dplyr")
+conflict_prefer("select", "dplyr")
+
 
 #-----------------------------------------------------------------------------------------#
-# Reading raster ----
-#-----------------------------------------------------------------------------------------#
-
-sky_brightness <- 
-    rast(here("data/ny_sky_brightness_geotiff.tif")) %>% 
-    st_as_stars() %>% 
-    rename(brightness_values = ny_sky_brightness_geotiff.tif)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
-# getting bbox for setting map bounds
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
-
-sky_brightness_bbox <- st_bbox(sky_brightness)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
-# converting to tbl, to pass to onRender
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
-
-sky_brightness_coords <- 
-    sky_brightness %>% 
-    as_tibble() %>% 
-    drop_na(brightness_values)
-
-# collecting garbage, because `stars` object is huge
-
-invisible(gc())
-
-#-----------------------------------------------------------------------------------------#
-# Adding extras ----
+# Customizations ----
 #-----------------------------------------------------------------------------------------#
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
-# plugins & dependencies
+# modifications of leaflet functions
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+
+# `addResetMapButton` from `leaflet.extras`, but allowing specification of position
+
+source("code/functions/addResetMapButtonPosition.R")
+
+# `addEasyButton` from `leaflet`, but removing fontawesome dependency (so I can use the current 
+#   version)
+
+source("code/functions/addEasyButtonNoFaDeps.R")
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# plugins
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 
 registerPlugin <- 
@@ -131,19 +123,6 @@ Geocoder_plugin <-
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
-# modifications of {leaflet} functions
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
-
-# `addResetMapButton` from {leaflet.extras}, but allowing specification of position
-
-source("code/functions/addResetMapButtonPosition.R")
-
-# `addEasyButton` from {leaflet}, but removing fontawesome dependency (so I can use the current 
-#   version from node repo)
-
-source("code/functions/addEasyButtonNoFaDeps.R")
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 # Custom JavaScript and HTML for `onRender` ----
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 
@@ -164,6 +143,31 @@ closest_dark_place <-
 #=========================================================================================#
 # Mapping
 #=========================================================================================#
+
+#-----------------------------------------------------------------------------------------#
+# Reading raster ----
+#-----------------------------------------------------------------------------------------#
+
+sky_brightness <- 
+    rast(here("data/ny_sky_brightness_geotiff.tif")) %>% 
+    st_as_stars() %>% 
+    rename(brightness_values = ny_sky_brightness_geotiff.tif)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# getting bbox for setting map bounds
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+
+sky_brightness_bbox <- st_bbox(sky_brightness)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# converting to tbl, to pass to onRender
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+
+sky_brightness_coords <- 
+    sky_brightness %>% 
+    as_tibble() %>% 
+    drop_na(brightness_values)
+
 
 #-----------------------------------------------------------------------------------------#
 # Constructing map
@@ -224,7 +228,7 @@ light_pollution_map <-
                 "USA_Topo_Maps/MapServer/tile/{z}/{y}/{x}"
             ), 
         attribution = 
-            glue(
+            paste0(
                 "Map tiles by <a href='http://goto.arcgisonline.com/maps/USA_Topo_Maps'>Esri</a> - ",
                 "Map Data © 2013 National Geographic Society, i-cubed"
             ), 
@@ -332,9 +336,9 @@ light_pollution_map <-
 
 saveWidget(
     widget = light_pollution_map,
-    file = here("output/light_pollution_map_self-contained.html"),
+    file = here("output/4-light-pollution_self-contained.html"),
     selfcontained = FALSE,
-    title = "Light Pollution Map for New York"
+    title = "4. Light pollution - Very complicated"
 )
 
 
@@ -346,9 +350,9 @@ saveWidget(
 
 saveWidget(
     widget = light_pollution_map,
-    file = here("output/light_pollution_map_non-self-contained.html"),
+    file = here("output/4-light-pollution_non-self-contained.html"),
     selfcontained = FALSE,
-    title = "Light Pollution Map for New York"
+    title = "4. Light pollution - Very complicated"
 )
 
 

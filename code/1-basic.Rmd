@@ -1,21 +1,28 @@
 ---
-title: "1. Example - simple"
+title: "1. Basic"
 output:
-  html_document:
+  html_document: 
+    toc: yes
+    theme: lumen
+    highlight: highlight\atom-one-dark.theme
     df_print: paged
+header-includes:
+   - \usepackage{cascadia-code}
+   - \usepackage[T1]{fontenc}
+mainfont: cascadiacode
 ---
 
 # Setting up
 
 <!-- install packages -->
 
-```{r, echo = FALSE}
+```{r install-packages, echo=FALSE}
 
 # These are the packages you already have
 
 packages_you_have <- installed.packages()[, "Package"]
 
-# These are all the packages we'll use
+# These are all the packages we'll use in this document
 
 packages_we_use <- c("dplyr", "tidyr", "leaflet", "jsonlite", "geojsonio", "sf", "viridisLite", "conflicted")
 
@@ -36,7 +43,7 @@ if (length(packages_you_need)) {
 
 ## Load packages
 
-```{r, echo = TRUE, warning = FALSE, message = FALSE}
+```{r load-packages, echo=TRUE, message=FALSE, warning=FALSE}
 
 library(dplyr)
 library(tidyr)
@@ -56,7 +63,7 @@ conflict_prefer("select", "dplyr")
 
 This is all you need to create a leaflet map:
 
-```{r}
+```{r useless-map}
 
 useless_map <- leaflet() %>% addTiles()
 useless_map
@@ -65,7 +72,7 @@ useless_map
 
 It's not very useful, but it's nice that it works out of the box. Let's set the initial view so we can see something:
 
-```{r}
+```{r sheep-meadow}
 
 sheep_meadow <- useless_map %>% setView(lng = -73.975, lat = 40.772, zoom = 15)
 sheep_meadow
@@ -74,7 +81,7 @@ sheep_meadow
 
 It still only has a tile layer. Let's add a marker with a popup.
 
-```{r}
+```{r sheep-meadow-marker}
 
 sheep_meadow_marker <- 
     sheep_meadow %>% 

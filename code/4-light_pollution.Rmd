@@ -1,0 +1,419 @@
+---
+title: "4. Light pollution - Very complicated"
+output:
+  html_document:
+    toc: yes
+    theme: lumen
+    highlight: highlight\atom-one-dark.theme
+    df_print: paged
+---
+
+# Setting up
+
+<!-- install packages -->
+
+```{r install-packages, echo=FALSE}
+
+# These are the packages you already have
+
+packages_you_have <- installed.packages()[, "Package"]
+
+# These are the packages we'll use in this document
+
+packages_we_use <- c("jsonlite", "dplyr", "tibble", "tidyr", "readr", "stringr", "leaflet", "leaflet.extras", "leafem", "terra", "stars", "geojsonio", "sf", "viridisLite", "here", "htmlwidgets", "htmltools", "conflicted")
+
+# These are the packages you need to install
+
+packages_you_need <- packages_we_use[!packages_we_use %in% packages_you_have]
+
+# This will install the packages you don't already have
+
+if (length(packages_you_need)) {
+    
+    cat("Installing:", paste(packages_you_need, collapse = ", "))
+    
+    install.packages(packages_you_need)
+}
+
+```
+
+## Load packages
+
+```{r load-packages, echo=TRUE, message=FALSE, warning=FALSE}
+
+library(jsonlite)
+library(dplyr)
+library(tibble)
+library(tidyr)
+library(readr)
+library(stringr)
+library(here)
+library(fs)
+library(leaflet)
+library(leaflet.extras)
+library(leafem)
+library(terra)
+library(stars)
+library(geojsonio)
+library(sf)
+library(viridisLite)
+library(htmlwidgets)
+library(htmltools)
+library(conflicted)
+
+conflict_prefer("filter", "dplyr")
+conflict_prefer("select", "dplyr")
+
+```
+
+## Customizations
+
+### Modified EasyButtons
+
+`addResetMapButton` from `leaflet.extras` but allowing specification of position  
+`addEasyButton` from `leaflet`, but removing fontawesome dependency (so I can use the current version from `plugins`)
+
+```{r EasyButtons}
+
+source("code/functions/addResetMapButtonPosition.R")
+source("code/functions/addEasyButtonNoFaDeps.R")
+
+```
+
+### Plugins
+
+Define a function to add plugins as map dependencies. These will get inserted into the HTML output with `<script>` (JavaScript) and `<link>` (CSS) tags.
+
+```{r registerPlugin}
+
+registerPlugin <- 
+    function(map, plugin) {
+        map$dependencies <- c(map$dependencies, list(plugin))
+        map
+    }
+
+```
+
+Fontawesome is a large set of icons, including lots of [free icons](https://fontawesome.com/icons?d=gallery&m=free). We'll use these to style the markers.
+
+```{r fontawesome}
+
+# my own FA library
+
+fa_dir <- here("code/plugins/@fortawesome/fontawesome-free")
+
+fa_plugin <-
+    htmlDependency(
+        name = "fontawesome", 
+        version = fromJSON(path(fa_dir, "package.json"))$version,
+        src = c(file = fa_dir),
+        stylesheet = "css/all.css",
+        all_files = TRUE
+    )
+
+```
+
+`geoblaze` is a JavaScript library for fast raster computations. Here we'll be using it to identify the raster value on click, which we will send to the dark points function.
+
+```{r geoblaze}
+
+# geoblaze raster computation
+
+geoblaze_dir <- here("code/plugins/geoblaze")
+
+geoblaze_plugin <-
+    htmlDependency(
+        name = "geoblaze", 
+        version = fromJSON(path(geoblaze_dir, "package.json"))$version,
+        src = c(file = path(geoblaze_dir, "dist")),
+        script = "geoblaze.web.min.js",
+        all_files = FALSE
+    )
+
+```
+
+`ExtraMarkers` is a leaflet extension that allows more control over marker styling.
+
+```{r ExtraMarkers}
+
+ExtraMarkers_dir <- here("code/plugins/Leaflet.ExtraMarkers")
+
+ExtraMarkers_plugin <-
+    htmlDependency(
+        name = "ExtraMarkers", 
+        version = fromJSON(path(ExtraMarkers_dir, "package.json"))$version,
+        src = c(file = path(ExtraMarkers_dir, "dist")),
+        stylesheet = "css/leaflet.extra-markers.min.css",
+        script = "js/leaflet.extra-markers.min.js",
+        all_files = TRUE
+    )
+
+
+```
+
+`Control.Geocoder` does what it sounds like: takes an address and geocodes it. The geocoded address will be treated like a map click.
+
+```{r geocoder}
+
+Geocoder_dir <- here("code/plugins/Control.Geocoder")
+
+Geocoder_plugin <-
+    htmlDependency(
+        name = "geocoder",
+        version = fromJSON(path(Geocoder_dir, "package.json"))$version,
+        src = list(file = path(Geocoder_dir, "dist")),
+        stylesheet = "Control.Geocoder.css",
+        script = "Control.Geocoder.js",
+        all_files = TRUE
+    )
+
+```
+
+
+### Custom JavaScript and HTML for `onRender`
+
+```{r custom-JS}
+
+closest_dark_place_js <- read_file(here("code/js/closest_dark_place.js"))
+dark_point_control    <- read_file(here("code/html/dark_point_control.html"))
+
+
+# Replacing "####" in JavaScript with HTML
+
+closest_dark_place <- 
+    str_replace(
+        closest_dark_place_js, 
+        "####",
+        dark_point_control
+    )
+
+
+```
+
+
+# Load and process data
+
+## Reading raster
+
+```{r read-raster}
+
+sky_brightness <- 
+    rast(here("data/ny_sky_brightness_geotiff.tif")) %>% 
+    st_as_stars() %>% 
+    rename(brightness_values = ny_sky_brightness_geotiff.tif)
+
+```
+
+### Getting bounding box for setting map bounds
+
+```{r bbox}
+
+sky_brightness_bbox <- st_bbox(sky_brightness)
+
+```
+
+### Converting to a `tbl`, to pass to `onRender`
+
+```{r coords}
+
+sky_brightness_coords <- 
+    sky_brightness %>% 
+    as_tibble() %>% 
+    drop_na(brightness_values)
+
+```
+
+# Constructing the map
+
+We'll first initialize the map, then add tiles[^1], add the light pollution raster, add some map control, add an image query that tells us the raster value under the mouse pointer, add plugins and dependencies, and finish by adding our custom JavaScript using `onRender`.
+
+```{r map}
+
+light_pollution_map <- 
+    
+    # initialize
+    
+    leaflet(
+        options = list(
+            "duration" = 0.375,
+            "zoomSnap" = 0.5,
+            "padding" = c(10, 10),
+            "preferCanvas" = FALSE, 
+            "updateWhenZooming" = FALSE,
+            "updateWhenIdle" = TRUE
+        )
+    ) %>%
+    
+    fitBounds(
+        lng1 = sky_brightness_bbox[[1]],
+        lat1 = sky_brightness_bbox[[2]],
+        lng2 = sky_brightness_bbox[[3]],
+        lat2 = sky_brightness_bbox[[4]]
+    ) %>%
+    
+    # enable browser tile caching, to speed up the map
+    
+    enableTileCaching() %>%
+    
+    # add tiles in groups, which we'll use for the tile layer switcher
+    
+    # zIndex = -1000 makes sure that the tiles are always the lowest layer
+    
+    addProviderTiles(
+        provider = providers$Stadia.AlidadeSmoothDark, 
+        options = providerTileOptions(zIndex = -1000),
+        group = "Dark"
+    ) %>%
+    addProviderTiles(
+        provider = providers$Stadia.StamenTonerLite, 
+        options = providerTileOptions(zIndex = -1000),
+        group = "Light"
+    ) %>%
+    addProviderTiles(
+        provider = providers$CartoDB.Voyager, 
+        options = providerTileOptions(zIndex = -1000),
+        group = "Streets"
+    ) %>%
+    
+    # you xcan also add tiles from other places
+    
+    addTiles(
+        urlTemplate = 
+            paste0(
+                "//services.arcgisonline.com/ArcGIS/rest/services/",
+                "USA_Topo_Maps/MapServer/tile/{z}/{y}/{x}"
+            ), 
+        attribution = 
+            paste0(
+                "Map tiles by <a href='http://goto.arcgisonline.com/maps/USA_Topo_Maps'>Esri</a> - ",
+                "Map Data © 2013 National Geographic Society, i-cubed"
+            ), 
+        options = tileOptions(zIndex = -1000),
+        group = "Topo"
+    ) %>% 
+    
+    # sky brightness raster
+    
+    addGeoRaster(
+        x = sky_brightness,
+        project = TRUE,
+        group = "Sky Brightness",
+        layerId = "Sky Brightness",
+        resolution = 64,
+        colorOptions =
+            colorOptions(
+                palette = inferno(64, direction = -1),
+
+                # modifying breaks to get a better mapping of visual differences to
+                #   photometric categories
+                #
+                # 16 = 2^4, so need 4 `sqrt()` calls to reverse:
+
+                breaks =
+                    sqrt(sqrt(sqrt(sqrt(
+                        seq(
+                            min(sky_brightness$brightness_values, na.rm = TRUE)^16,
+                            max(sky_brightness$brightness_values, na.rm = TRUE)^16,
+                            length.out = 64
+                        )
+                    )))),
+                na.color = "#00000000"
+            ),
+        options =
+            tileOptions(
+                zIndex = 1000,
+                updateWhenZooming = FALSE,
+                updateWhenIdle = TRUE
+            )
+    ) %>%
+    
+    # adding controls
+    
+    # all the `group` and `layerId` arguments have to be the same to get the raster, image query, and layers control to work (as far as I can tell)
+
+    addLayersControl(
+        baseGroups = c("Dark", "Light", "Streets", "Topo"),
+        overlayGroups = "Sky Brightness",
+        options = layersControlOptions(collapsed = FALSE, autoZIndex = FALSE),
+        position = "topright"
+    ) %>%
+    
+    # raster mouseover values (put this after layers control for better positioning on map)
+    
+    addImageQuery(
+        x = sky_brightness,
+        group = "Sky Brightness",
+        layerId = "Sky Brightness",
+        position = "topright",
+        digits = 2,
+        type = "mousemove",
+        prefix = "",
+        project = TRUE
+    ) %>% 
+    
+    # reset buttons
+    
+    addResetMapButtonPosition(position = "bottomleft") %>%
+    
+    # registering dependencies
+    
+    addAwesomeMarkersDependencies(libs = c("ion", "glyphicon")) %>%
+
+    # registering plugins
+    
+    registerPlugin(fa_plugin) %>%
+    registerPlugin(geoblaze_plugin) %>%
+    registerPlugin(ExtraMarkers_plugin) %>%
+    registerPlugin(Geocoder_plugin) %>%
+    
+    # adding specialty JavaScript to find closest dark place to click
+    
+    onRender(
+        str_c(
+            "function(el, x, data) {\n",
+            closest_dark_place,
+            "}"
+        ),
+        data = sky_brightness_coords
+    )
+
+```
+
+# Save the map
+
+We'll save 2 different versions: self-contained, and non-self-contained
+
+## Self-contained
+
+In this version, all the data and dependencies are included in-line in the single HTML output file.
+
+```{r save-self-contained}
+
+saveWidget(
+    widget = light_pollution_map,
+    file = here("output/4-light-pollution_self-contained.html"),
+    selfcontained = TRUE,
+    title = "4. Light pollution - Very complicated"
+)
+
+```
+
+The self-contained version can get pretty big, but you don't have to worry about anything except that 1 output file.
+
+## Non-self-contained
+
+Here, the data and dependencies are put into folders, which the HTML will point to.
+
+```{r save-non-self-contained}
+
+saveWidget(
+    widget = light_pollution_map,
+    file = here("output/4-light-pollution_non-self-contained.html"),
+    selfcontained = FALSE,
+    title = "4. Light pollution - Very complicated"
+)
+
+```
+
+
+[^1]: You can check out the provider tiles with the [Leaflet-providers preview](https://leaflet-extras.github.io/leaflet-providers/preview/)

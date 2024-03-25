@@ -1,21 +1,27 @@
 ---
-title: "3. Raster - advanced"
+title: "3. Raster - Advanced"
 output:
   html_document:
+    toc: yes
+    theme: lumen
+    highlight: highlight\atom-one-dark.theme
     df_print: paged
+header-includes:
+   - \usepackage[default]{cascadia-code}
+   - \usepackage[T1]{fontenc}
 ---
 
 # Setting up
 
 <!-- install packages -->
 
-```{r, echo = FALSE}
+```{r install-packages, echo=FALSE}
 
 # These are the packages you already have
 
 packages_you_have <- installed.packages()[, "Package"]
 
-# These are all the packages we'll use
+# These are all the packages we'll use in this document
 
 packages_we_use <- c("jsonlite", "dplyr", "tibble", "tidyr", "leaflet", "leaflet.extras", "leafem", "terra", "stars", "geojsonio", "sf", "viridisLite", "here", "htmlwidgets", "htmltools", "conflicted")
 
@@ -36,12 +42,13 @@ if (length(packages_you_need)) {
 
 ## Load packages
 
-```{r, echo = TRUE, warning = FALSE, message = FALSE}
+```{r load-packages, echo=TRUE, message=FALSE, warning=FALSE}
 
 library(jsonlite)
 library(dplyr)
 library(tibble)
 library(tidyr)
+library(here)
 library(leaflet)
 library(leaflet.extras)
 library(leafem)
@@ -50,7 +57,6 @@ library(stars)
 library(geojsonio)
 library(sf)
 library(viridisLite)
-library(here)
 library(htmlwidgets)
 library(htmltools)
 library(conflicted)
@@ -65,7 +71,7 @@ conflict_prefer("select", "dplyr")
 
 `leaflet.extras::addResetMapButton` but allowing specification of position
 
-```{r}
+```{r reset-button}
 
 source(here("code/functions/addResetMapButtonPosition.R"))
 
@@ -78,7 +84,7 @@ source(here("code/functions/addResetMapButtonPosition.R"))
 
 We'll crop the raster to show only Queens
 
-```{r}
+```{r queens-border}
 
 base_url <- "https://raw.githubusercontent.com/nychealth/EHDP-data/production/"
 
@@ -99,7 +105,7 @@ queens_border <-
 
 Downloaded from [NYC Open Data](https://data.cityofnewyork.us/Environment/NYCCAS-Air-Pollution-Rasters/q68s-8qxv/about_data).  
 
-```{r}
+```{r read-raster}
 
 nyccas_pm25_qns_stars <- 
     rast(here("data/NYCCAS/AnnAvg1_13_300mRaster/aa13_pm300m")) %>%
@@ -121,7 +127,7 @@ nyccas_pm25_qns_stars <-
 We'll first initialize the map, then add tiles[^1], add the NYCCAS raster, add a map control, add an image query that tells us the raster value under the mouse pointer, and finish by adding the custom reset button.
 
 
-```{r}
+```{r map}
 
 nyccas_map <- 
     
@@ -219,13 +225,13 @@ We'll save 2 different versions: self-contained, and non-self-contained
 
 In this version, all the data and dependencies are included in-line in the single HTML output file.
 
-```{r}
+```{r save-self-contained}
 
 saveWidget(
     widget = nyccas_map,
-    file = here("output/nyccas_map_self-contained.html"),
+    file = here("output/3-raster_self-contained.html"),
     selfcontained = TRUE,
-    title = "NYCCAS PM2.5 2022 Queens"
+    title = "3. Raster - Advanced"
 )
 
 ```
@@ -236,13 +242,13 @@ The self-contained version can get pretty big, but you don't have to worry about
 
 Here, the data and dependencies are put into folders, which the HTML will point to.
 
-```{r}
+```{r save-non-self-contained}
 
 saveWidget(
     widget = nyccas_map,
-    file = here("output/nyccas_map_non-self-contained.html"),
+    file = here("output/3-raster_non-self-contained.html"),
     selfcontained = FALSE,
-    title = "NYCCAS PM2.5 2022 Queens"
+    title = "3. Raster - Advanced"
 )
 
 ```

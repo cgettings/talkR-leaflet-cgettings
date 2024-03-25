@@ -1,7 +1,7 @@
 ###########################################################################################-
 ###########################################################################################-
 ##
-## 3. Raster - advanced ----
+## 3. Raster - Advanced ----
 ##
 ###########################################################################################-
 ###########################################################################################-
@@ -18,6 +18,7 @@ library(jsonlite)
 library(dplyr)
 library(tibble)
 library(tidyr)
+library(here)
 library(leaflet)
 library(leaflet.extras)
 library(leafem)
@@ -26,7 +27,6 @@ library(stars)
 library(geojsonio)
 library(sf)
 library(viridisLite)
-library(here)
 library(htmlwidgets)
 library(htmltools)
 library(conflicted)
@@ -189,9 +189,9 @@ nyccas_map
 
 saveWidget(
     widget = nyccas_map,
-    file = here("output/nyccas_map_self-contained.html"),
+    file = here("output/3-raster_self-contained.html"),
     selfcontained = TRUE,
-    title = "NYCCAS PM2.5 2022 Queens"
+    title = "3. Raster - Advanced"
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
@@ -200,9 +200,9 @@ saveWidget(
 
 saveWidget(
     widget = nyccas_map,
-    file = here("output/nyccas_map_non-self-contained.html"),
+    file = here("output/3-raster_non-self-contained.html"),
     selfcontained = FALSE,
-    title = "NYCCAS PM2.5 2022 Queens"
+    title = "3. Raster - Advanced"
 )
 
 

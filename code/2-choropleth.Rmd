@@ -1,7 +1,10 @@
 ---
-title: "2. Choropleth - intermediate"
+title: "2. Choropleth - Intermediate"
 output:
-  html_document:
+  html_document: 
+    toc: yes
+    theme: lumen
+    highlight: highlight\atom-one-dark.theme
     df_print: paged
 ---
 
@@ -9,13 +12,13 @@ output:
 
 <!-- install packages -->
 
-```{r, echo = FALSE}
+```{r install-packages, echo=FALSE}
 
 # These are the packages you already have
 
 packages_you_have <- installed.packages()[, "Package"]
 
-# These are all the packages we'll use
+# These are all the packages we'll use in this document
 
 packages_we_use <- c("dplyr", "tidyr", "leaflet", "jsonlite", "geojsonio", "sf", "viridisLite", "here", "htmlwidgets", "conflicted")
 
@@ -36,7 +39,7 @@ if (length(packages_you_need)) {
 
 ## Load packages
 
-```{r, echo = TRUE, warning = FALSE, message = FALSE}
+```{r load-packages, echo=TRUE, message=FALSE, warning=FALSE}
 
 library(dplyr)
 library(tidyr)
@@ -58,7 +61,7 @@ conflict_prefer("select", "dplyr")
 
 Let's make a choropleth using data from the [Environment and Health Data Portal](https://a816-dohbesp.nyc.gov/IndicatorPublic/). We'll download data, metadata, and geo data from the `EHDP-data` GitHub repository.
 
-```{r}
+```{r base_url}
 
 # set base url
 
@@ -73,7 +76,7 @@ base_url <- "https://raw.githubusercontent.com/nychealth/EHDP-data/production/"
 
 Indicator 2416 is ["Litter basket coverage"](https://a816-dohbesp.nyc.gov/IndicatorPublic/data-explorer/active-design/?id=2416).
 
-```{r}
+```{r load-data}
 
 litter_baskets_data <- 
     fromJSON(paste0(base_url, "indicators/data/2416.json")) %>% 
@@ -86,9 +89,7 @@ litter_baskets_data <-
 
 #### Indicators
 
-```{r}
-
-# indicator metadata
+```{r load-indicator-metadata}
 
 litter_baskets_metadata <- 
     fromJSON(paste0(base_url, "indicators/metadata/metadata.json")) %>% 
@@ -107,9 +108,7 @@ litter_baskets_metadata <-
 
 #### Time periods
 
-```{r}
-
-# time periods metadata
+```{r load-time-period-metadata}
 
 time_periods <- 
     fromJSON(paste0(base_url, "indicators/metadata/TimePeriods.json")) %>% 
@@ -120,7 +119,7 @@ time_periods <-
 
 ### Then get the geo data
 
-```{r}
+```{r load-geo-data}
 
 nta_2020 <- topojson_read(paste0(base_url, "geography/NTA_2020.topo.json"), crs = 4326)
 
@@ -130,7 +129,7 @@ The `topojson_read` function from `geojsonio` returns an `sf`-classed object wit
 
 ## Join the data and metadata
 
-```{r}
+```{r join-data-metadata}
 
 litter_baskets <- 
     
@@ -186,9 +185,11 @@ litter_baskets
 
 ```
 
-## Now map it!
+# Constructing the map
 
-```{r}
+We'll first initialize the map, then add tiles[^1], add the NTA polygons, and finish by adding a legend.
+
+```{r map}
 
 # but first generate a color palette function using viridis
 
@@ -250,13 +251,13 @@ We'll save 2 different versions: self-contained, and non-self-contained
 
 In this version, all the data and dependencies are included in-line in the single HTML output file.
 
-```{r}
+```{r save-self-contained}
 
 saveWidget(
     widget = litter_baskets_map,
-    file = here("output/choropleth_map_self-contained.html"),
+    file = here("output/2-choropleth_self-contained.html"),
     selfcontained = TRUE,
-    title = "Litter basket coverage choropleth"
+    title = "2. Choropleth - Intermediate"
 )
 
 ```
@@ -267,13 +268,16 @@ The self-contained version can get pretty big, but you don't have to worry about
 
 Here, the data and dependencies are put into folders, which the HTML will point to.
 
-```{r}
+```{r save-non-self-contained}
 
 saveWidget(
     widget = litter_baskets_map,
-    file = here("output/choropleth_map_non-self-contained.html"),
+    file = here("output/2-choropleth_non-self-contained.html"),
     selfcontained = FALSE,
-    title = "Litter basket coverage choropleth"
+    title = "2. Choropleth - Intermediate"
 )
 
 ```
+
+
+[^1]: You can check out the provider tiles with the [Leaflet-providers preview](https://leaflet-extras.github.io/leaflet-providers/preview/)
