@@ -24,7 +24,6 @@ library(leaflet.extras)
 library(leafem)
 library(terra)
 library(stars)
-library(geojsonio)
 library(sf)
 library(viridisLite)
 library(htmlwidgets)
@@ -54,7 +53,7 @@ source(here("code/functions/addResetMapButtonPosition.R"))
 base_url <- "https://raw.githubusercontent.com/nychealth/EHDP-data/production/"
 
 queens_border <- 
-    topojson_read(paste0(base_url, "geography/borough.topo.json"), crs = 4326) %>% 
+    read_sf(paste0(base_url, "geography/borough.topo.json"), crs = 4326) %>% 
     as_tibble() %>% 
     st_as_sf() %>% 
     filter(name == "Queens") %>% 

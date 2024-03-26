@@ -21,7 +21,7 @@ packages_you_have <- installed.packages()[, "Package"]
 
 # These are all the packages we'll use in this document
 
-packages_we_use <- c("rmarkdown", "dplyr", "tidyr", "leaflet", "jsonlite", "geojsonio", "sf", "viridisLite", "conflicted")
+packages_we_use <- c("rmarkdown", "dplyr", "leaflet", "conflicted")
 
 # These are the packages you need to install
 
@@ -45,10 +45,6 @@ if (length(packages_you_need)) {
 library(dplyr)
 library(tidyr)
 library(leaflet)
-library(jsonlite)
-library(geojsonio)
-library(sf)
-library(viridis)
 library(conflicted)
 
 conflict_prefer("filter", "dplyr")

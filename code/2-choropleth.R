@@ -18,7 +18,6 @@ library(dplyr)
 library(tidyr)
 library(leaflet)
 library(jsonlite)
-library(geojsonio)
 library(sf)
 library(viridisLite)
 library(here)
@@ -82,7 +81,7 @@ time_periods <-
 
 # The `topojson_read` function from `geojsonio` returns an `sf`-classed object with a `geometry` column. This is what leaflet is going to use to create the choropleth.
 
-nta_2020 <- topojson_read(paste0(base_url, "geography/NTA_2020.topo.json"), crs = 4326)
+nta_2020 <- read_sf(paste0(base_url, "geography/NTA_2020.topo.json"), crs = 4326)
 
 
 #-----------------------------------------------------------------------------------------#

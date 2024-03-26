@@ -21,7 +21,7 @@ packages_you_have <- installed.packages()[, "Package"]
 
 # These are all the packages we'll use in this document
 
-packages_we_use <- c("rmarkdown", "dplyr", "tidyr", "leaflet", "jsonlite", "geojsonio", "sf", "viridisLite", "here", "htmlwidgets", "conflicted")
+packages_we_use <- c("rmarkdown", "dplyr", "tidyr", "leaflet", "jsonlite", "sf", "viridisLite", "here", "htmlwidgets", "conflicted")
 
 # These are the packages you need to install
 
@@ -46,7 +46,6 @@ library(dplyr)
 library(tidyr)
 library(leaflet)
 library(jsonlite)
-library(geojsonio)
 library(sf)
 library(viridisLite)
 library(here)
@@ -122,7 +121,7 @@ time_periods <-
 
 ```{r load-geo-data}
 
-nta_2020 <- topojson_read(paste0(base_url, "geography/NTA_2020.topo.json"), crs = 4326)
+nta_2020 <- read_sf(paste0(base_url, "geography/NTA_2020.topo.json"), crs = 4326)
 
 ```
 
