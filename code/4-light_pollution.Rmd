@@ -21,7 +21,7 @@ packages_you_have <- installed.packages()[, "Package"]
 
 # These are the packages we'll use in this document
 
-packages_we_use <- c("rmarkdown", "jsonlite", "dplyr", "tibble", "tidyr", "readr", "stringr", "leaflet", "leaflet.extras", "leafem", "terra", "stars", "geojsonio", "sf", "lwgeom", "viridisLite", "here", "htmlwidgets", "htmltools", "conflicted")
+packages_we_use <- c("rmarkdown", "jsonlite", "dplyr", "tibble", "tidyr", "readr", "stringr", "leaflet", "leaflet.extras", "leafem", "terra", "stars", "sf", "lwgeom", "viridisLite", "here", "htmlwidgets", "htmltools", "conflicted")
 
 # These are the packages you need to install
 
@@ -55,7 +55,6 @@ library(leaflet.extras)
 library(leafem)
 library(terra)
 library(stars)
-library(geojsonio)
 library(sf)
 library(viridisLite)
 library(htmlwidgets)
@@ -399,7 +398,7 @@ We'll save 2 different versions: self-contained, and non-self-contained
 
 In this version, all the data and dependencies are included in-line in the single HTML output file.
 
-```{r save-self-contained}
+```{r save-self-contained, eval=FALSE}
 
 saveWidget(
     widget = light_pollution_map,
@@ -416,7 +415,7 @@ The self-contained version can get pretty big, but you don't have to worry about
 
 Here, the data and dependencies are put into folders, which the HTML will point to.
 
-```{r save-non-self-contained}
+```{r save-non-self-contained, eval=FALSE}
 
 saveWidget(
     widget = light_pollution_map,
