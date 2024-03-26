@@ -173,6 +173,11 @@ sky_brightness_coords <-
 # Constructing map
 #-----------------------------------------------------------------------------------------#
 
+# access token for JawgMaps (free, and can be revoked!)
+
+jawg_token <- "jBn4H6Bv04xoEkuaRdWm4vIcIJjGYmLsD1jZ2kRL5uSZk61d1YhwzvdVM4FBaadM"
+
+
 light_pollution_map <- 
     
     # initialize
@@ -204,13 +209,17 @@ light_pollution_map <-
     # zIndex = -1000 makes sure that the tiles are always the lowest layer
     
     addProviderTiles(
-        provider = providers$Stadia.AlidadeSmoothDark, 
-        options = providerTileOptions(zIndex = -1000),
+        # provider = providers$Stadia.AlidadeSmoothDark, 
+        # provider = providers$CartoDB.DarkMatter, 
+        provider = providers$Jawg.Matrix, 
+        options = providerTileOptions(zIndex = -1000, accessToken = jawg_token),
         group = "Dark"
     ) %>%
     addProviderTiles(
-        provider = providers$Stadia.StamenTonerLite, 
-        options = providerTileOptions(zIndex = -1000),
+        # provider = providers$Stadia.StamenTonerLite, 
+        # provider = providers$CartoDB.Positron, 
+        provider = providers$Jawg.Light, 
+        options = providerTileOptions(zIndex = -1000, accessToken = jawg_token),
         group = "Light"
     ) %>%
     addProviderTiles(
