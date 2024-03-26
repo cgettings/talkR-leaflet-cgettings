@@ -21,7 +21,7 @@ packages_you_have <- installed.packages()[, "Package"]
 
 # These are all the packages we'll use in this document
 
-packages_we_use <- c("rmarkdown", "dplyr", "tidyr", "leaflet", "jsonlite", "sf", "viridisLite", "here", "htmlwidgets", "conflicted")
+packages_we_use <- c("rmarkdown", "dplyr", "tidyr", "crosstalk", "leaflet", "jsonlite", "sf", "viridisLite", "here", "htmlwidgets", "conflicted")
 
 # These are the packages you need to install
 

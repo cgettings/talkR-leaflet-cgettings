@@ -21,7 +21,7 @@ packages_you_have <- installed.packages()[, "Package"]
 
 # These are all the packages we'll use in this document
 
-packages_we_use <- c("rmarkdown", "dplyr", "leaflet", "conflicted")
+packages_we_use <- c("rmarkdown", "dplyr", "crosstalk", "leaflet", "conflicted")
 
 # These are the packages you need to install
 
