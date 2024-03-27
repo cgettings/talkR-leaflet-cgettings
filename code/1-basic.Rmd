@@ -9,6 +9,8 @@ output:
     df_print: paged
 ---
 
+You can find more simple examples in the [leaflet R package docs](https://rstudio.github.io/leaflet/articles/).
+
 # Setting up
 
 <!-- install packages -->
@@ -89,4 +91,38 @@ sheep_meadow_marker
 
 ```
 
-You can find more simple examples in the [leaflet R package docs](https://rstudio.github.io/leaflet/articles/).
+# Save the map
+
+We'll save 2 different versions: self-contained, and non-self-contained
+
+## Self-contained
+
+In this version, all the data and dependencies are included in-line in the single HTML output file.
+
+```{r save-self-contained}
+
+saveWidget(
+    widget = sheep_meadow_marker,
+    file = here("docs/1-basic_self-contained.html"),
+    selfcontained = TRUE,
+    title = "1. Basic"
+)
+
+```
+
+The self-contained version can get pretty big, but you don't have to worry about anything except that 1 output file.
+
+## Non-self-contained
+
+Here, the data and dependencies are put into folders, which the HTML will point to.
+
+```{r save-non-self-contained}
+
+saveWidget(
+    widget = sheep_meadow_marker,
+    file = here("docs/1-basic_non-self-contained.html"),
+    selfcontained = FALSE,
+    title = "1. Basic"
+)
+
+```
