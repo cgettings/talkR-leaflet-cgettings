@@ -40,6 +40,8 @@ source(install_packages_loc)
 library(dplyr)
 library(tidyr)
 library(leaflet)
+library(here)
+library(htmlwidgets)
 library(conflicted)
 
 conflict_prefer("filter", "dplyr")
