@@ -2,6 +2,8 @@
 pagetitle: Output from example scripts
 ---
 
+Slides are available in the GitHub repository.
+
 # Output from example scripts
 
 ## Knitted documents
