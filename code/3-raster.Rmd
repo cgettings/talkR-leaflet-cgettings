@@ -83,15 +83,30 @@ We'll crop the raster to show only Queens
 
 ```{r queens-border}
 
+# set base_url
+
 base_url <- "https://raw.githubusercontent.com/nychealth/EHDP-data/production/"
 
-queens_border <- 
+# get nyc borders 
+
+nyc_borders <- 
     read_sf(paste0(base_url, "geography/borough.topo.json"), crs = 4326) %>% 
-    as_tibble() %>% 
-    st_as_sf() %>% 
+    as_tibble()
+
+# now get just the queens border
+
+queens_border <- 
+    nyc_borders %>% 
     filter(name == "Queens") %>% 
-    pull(geometry) %>% 
-    vect()
+    st_as_sf()
+
+# turn into a SpatVector to use for cropping
+
+queens_border_vec <- vect(queens_border$geometry)
+
+# convert to json (which we'll pass to `onRender` as a demonstration)
+
+nyc_borders_json <- toJSON(nyc_borders)
 
 ```
 
@@ -107,7 +122,7 @@ Downloaded from [NYC Open Data](https://data.cityofnewyork.us/Environment/NYCCAS
 nyccas_pm25_qns_stars <- 
     rast(here("data/NYCCAS/AnnAvg1_13_300mRaster/aa13_pm300m")) %>%
     project("epsg:4326") %>% 
-    crop(queens_border, mask = TRUE) %>% 
+    crop(queens_border_vec, mask = TRUE) %>% 
         
     # transforming to stars object, to make adding to leaflet easier
     
@@ -214,7 +229,27 @@ nyccas_map <-
     
     # reset buttons
     
-    addResetMapButtonPosition(position = "bottomleft")
+    addResetMapButtonPosition(position = "bottomleft") %>% 
+    
+    # add data and custom javascript
+    
+    onRender(
+        jsCode = 
+            "function(element, widget, data) { 
+        
+                console.log('> element:', element);
+                console.log('> widget:', widget);
+                console.log('> data:', data);
+
+                let queens = data.filter(function(d) {return d.name == 'Queens'})
+                // let queens = data.filter(d => d.name == 'Queens')
+        
+                console.log('> queens:', queens);
+            }",
+        data = nyc_borders_json
+        # data = nyc_borders
+        # data = list("nyc_borders" = nyc_borders)
+    )
 
 
 # now print the map

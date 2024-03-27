@@ -50,15 +50,30 @@ source(here("code/functions/addResetMapButtonPosition.R"))
 # border for boro
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 
+# set base_url
+
 base_url <- "https://raw.githubusercontent.com/nychealth/EHDP-data/production/"
 
-queens_border <- 
+# get nyc borders 
+
+nyc_borders <- 
     read_sf(paste0(base_url, "geography/borough.topo.json"), crs = 4326) %>% 
-    as_tibble() %>% 
-    st_as_sf() %>% 
+    as_tibble()
+
+# now get just the queens border
+
+queens_border <- 
+    nyc_borders %>% 
     filter(name == "Queens") %>% 
-    pull(geometry) %>% 
-    vect()
+    st_as_sf()
+
+# turn into a SpatVector to use for cropping
+
+queens_border_vec <- vect(queens_border$geometry)
+
+# convert to json (which we'll pass to `onRender` as a demonstration)
+
+nyc_borders_json <- toJSON(nyc_borders)
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
@@ -180,7 +195,27 @@ nyccas_map <-
     
     # reset buttons
     
-    addResetMapButtonPosition(position = "bottomleft")
+    addResetMapButtonPosition(position = "bottomleft") %>% 
+    
+    # # add data and custom javascript
+    
+    onRender(
+        jsCode = 
+            "function(element, widget, data) { 
+        
+                console.log('> element:', element);
+                console.log('> widget:', widget);
+                console.log('> data:', data);
+
+                let queens = data.filter(function(d) {return d.name == 'Queens'})
+                // let queens = data.filter(d => d.name == 'Queens')
+        
+                console.log('> queens:', queens);
+            }",
+        data = nyc_borders_json
+        # data = nyc_borders
+        # data = list("nyc_borders" = nyc_borders)
+    )
 
 
 # now print the map
