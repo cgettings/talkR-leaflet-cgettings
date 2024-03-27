@@ -161,7 +161,7 @@ litter_baskets <-
         # html works for popups
         popup = 
             paste0(
-                "<span style='font-size:1rem'>",
+                "<span style='font-size:1em'>",
                 "<b>", GEONAME, "</b>", 
                 "<br/><br/>", 
                 MeasurementType, ", ", TimePeriod, ":", 
