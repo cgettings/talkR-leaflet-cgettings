@@ -160,7 +160,8 @@ litter_baskets_map <-
     
     # add some nice low-key tiles
     
-    addProviderTiles(providers$Stadia.StamenTonerLite) %>%
+    # addProviderTiles(providers$Stadia.StamenTonerLite) %>%
+    addProviderTiles(providers$CartoDB.Voyager) %>%
     
     # add the choropleth polygons, plus the palette function and the labels
     

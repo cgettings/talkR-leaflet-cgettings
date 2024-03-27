@@ -398,7 +398,7 @@ We'll save 2 different versions: self-contained, and non-self-contained
 
 In this version, all the data and dependencies are included in-line in the single HTML output file.
 
-```{r save-self-contained, eval=FALSE}
+```{r save-self-contained}
 
 saveWidget(
     widget = light_pollution_map,
@@ -415,7 +415,7 @@ The self-contained version can get pretty big, but you don't have to worry about
 
 Here, the data and dependencies are put into folders, which the HTML will point to.
 
-```{r save-non-self-contained, eval=FALSE}
+```{r save-non-self-contained}
 
 saveWidget(
     widget = light_pollution_map,

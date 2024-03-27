@@ -19,6 +19,7 @@ library(dplyr)
 library(tibble)
 library(tidyr)
 library(readr)
+library(stringr)
 library(here)
 library(fs)
 library(leaflet)
@@ -280,6 +281,8 @@ light_pollution_map <-
     ) %>%
     
     # adding controls
+
+    # all the `group` and `layerId` arguments have to be the same to get the raster, image query, and layers control to work (as far as I can tell)
     
     addLayersControl(
         baseGroups = c("Dark", "Light", "Streets", "Topo"),
@@ -288,7 +291,7 @@ light_pollution_map <-
         position = "topright"
     ) %>%
     
-    # sky brightness raster mouseover values
+    # raster mouseover values (put this after layers control for better positioning on map)
     
     addImageQuery(
         x = sky_brightness,
@@ -308,7 +311,9 @@ light_pollution_map <-
     # registering dependencies
     
     addAwesomeMarkersDependencies(libs = c("ion", "glyphicon")) %>%
-    
+
+    # registering plugins
+
     registerPlugin(fa_plugin) %>%
     registerPlugin(geoblaze_plugin) %>%
     registerPlugin(ExtraMarkers_plugin) %>%
@@ -325,6 +330,7 @@ light_pollution_map <-
         data = sky_brightness_coords
     )
     
+    light_pollution_map
 
 # light_pollution_map
 
@@ -345,7 +351,7 @@ light_pollution_map <-
 saveWidget(
     widget = light_pollution_map,
     file = here("output/4-light-pollution_self-contained.html"),
-    selfcontained = FALSE,
+    selfcontained = TRUE,
     title = "4. Light pollution - Very complicated"
 )
 
