@@ -232,7 +232,7 @@ nyccas_map
 
 saveWidget(
     widget = nyccas_map,
-    file = here("output/3-raster_self-contained.html"),
+    file = here("docs/3-raster_self-contained.html"),
     selfcontained = TRUE,
     title = "3. Raster - Advanced"
 )
@@ -243,7 +243,7 @@ saveWidget(
 
 saveWidget(
     widget = nyccas_map,
-    file = here("output/3-raster_non-self-contained.html"),
+    file = here("docs/3-raster_non-self-contained.html"),
     selfcontained = FALSE,
     title = "3. Raster - Advanced"
 )
