@@ -13,9 +13,9 @@ let selected_brightness;
 // adding `div` for custom dark point control
 //=============================================================================//
 
-let controls = L.control({position: 'bottomright'});
+let dark_point_control = L.control({position: 'bottomright'});
 
-controls.onAdd = function (map) {
+dark_point_control.onAdd = function (map) {
     
     let div = L.DomUtil.create('div');
     
@@ -32,7 +32,7 @@ controls.onAdd = function (map) {
     
 };
 
-controls.addTo(map);
+dark_point_control.addTo(map);
 
 // adding listener for dark point control input button
 
@@ -46,7 +46,7 @@ dark_point_update_button.addEventListener("click", e => map.fire("update"));
 
 // creating variable to store grid coordinates pulled from data
 
-grid_coords = [];
+let grid_coords = [];
 
 // looping through all coords in data
 
@@ -65,7 +65,7 @@ for (let i = 0; i < data.x.length; i++) {
 // selected point function
 //------------------------------------------------------------------------------//
 
-function selected_point_function(latlng, georaster) {
+const selected_point_function = function(latlng, georaster) {
     
     //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
     // clearing map
@@ -158,15 +158,19 @@ function selected_point_function(latlng, georaster) {
 //  closest point(s)
 
 
-function grid_coords_filter_fun (grid_coords) {
+const grid_coords_filter_fun = function(grid_coords) {
+
+    let exp_val = this;
+
+    // console.log("this [grid_coords_filter_fun]", this);
     
     return grid_coords.alt >= 
             (selected_brightness + 
-                (exposure_value * 0.752575)) && 
+                (exp_val * 0.752575)) && 
         
            grid_coords.alt <= 
             (selected_brightness + 
-                (exposure_value * 0.752575) + (0.752575 * Math.sign(exposure_value))
+                (exp_val * 0.752575) + (0.752575 * Math.sign(exp_val))
             );
     
 }
@@ -176,8 +180,8 @@ function grid_coords_filter_fun (grid_coords) {
 // Function to add dark points
 //------------------------------------------------------------------------------//
 
-function dark_point_function(e) {
-    
+const dark_point_function = function(e) {
+
     //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
     // getting value from controls (on click)
     //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
@@ -187,20 +191,24 @@ function dark_point_function(e) {
     //  in the HTML)
     
     
-    num_points_value = 
+    let num_points_value = 
         document.getElementById('num_points').value !== '' ? 
         document.getElementById('num_points').value : 
         1;
     
-    distance_value = 
+    let distance_value = 
         document.getElementById('distance').value !== '' ? 
         document.getElementById('distance').value : 
         Infinity;
     
-    exposure_value = 
+    let exposure_value = 
         document.getElementById('exposure').value !== '' ? 
         document.getElementById('exposure').value : 
-        1;     
+        1;
+
+    console.log("num_points_value", num_points_value);
+    console.log("distance_value", distance_value);
+    console.log("exposure_value", exposure_value);
 
     num_points_value = Number(num_points_value);
     distance_value   = Number(distance_value);
@@ -209,7 +217,7 @@ function dark_point_function(e) {
     
     // applying the filtering function to the data
     
-    grid_coords_filtered = grid_coords.filter(grid_coords_filter_fun);
+    let grid_coords_filtered = grid_coords.filter(grid_coords_filter_fun, exposure_value);
     
     
     //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
@@ -218,12 +226,12 @@ function dark_point_function(e) {
     
     // getting location of selected point
     
-    selected_point_group = map.layerManager.getLayerGroup('selected_point');
-    selected_point_loc = Object.values(selected_point_group._layers)[0].getLatLng();
+    let selected_point_group = map.layerManager.getLayerGroup('selected_point');
+    let selected_point_loc = Object.values(selected_point_group._layers)[0].getLatLng();
     
     // creating variables for computed distances
     
-    results = [];
+    let results = [];
     
     // looping through all filtered points to get the distance values (`push` appends an array)
     
@@ -231,7 +239,7 @@ function dark_point_function(e) {
     
     for (let j = 0; j < grid_coords_filtered.length; j++) {
         
-        distance = grid_coords_filtered[j].distanceTo(selected_point_loc);
+        let distance = grid_coords_filtered[j].distanceTo(selected_point_loc);
         
         results.push({"point": j, "grid_point": grid_coords_filtered[j], "distance": distance});
         
@@ -245,9 +253,7 @@ function dark_point_function(e) {
     
     // filtering to get those within the requested distance
     
-    results_filtered = [];
-    
-    results_filtered = results.filter(results => results.distance <= distance_value);
+    let results_filtered = results.filter(results => results.distance <= distance_value);
     
     
     //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
@@ -256,7 +262,7 @@ function dark_point_function(e) {
     
     // pulling out the top [x] values
     
-    dark_points = results.slice(0, num_points_value);
+    let dark_points = results_filtered.slice(0, num_points_value);
     
     
     // if there is no darker point than the one clicked, don't do anything
@@ -269,7 +275,7 @@ function dark_point_function(e) {
         
         // formatting icon for dark point marker(s)
         
-        dark_point_icon = 
+        let dark_point_icon = 
             L.ExtraMarkers.icon({
                 icon: "glyphicon-star",
                 iconColor: "#34FEF1",
@@ -336,7 +342,7 @@ function dark_point_function(e) {
         
         // opening all tooltips
         
-        dark_points_group = map.layerManager.getLayerGroup('dark_points');
+        let dark_points_group = map.layerManager.getLayerGroup('dark_points');
         dark_points_group.eachLayer(layer => layer.openTooltip());
         
     }
@@ -403,7 +409,7 @@ fetch(data_fl)
                 
                 selected_point_function(e.latlng, georaster);
                 dark_point_function(e);
-                    
+                
             });
             
             
@@ -412,7 +418,7 @@ fetch(data_fl)
             //---------------------------------------------------------------------------//
             
             map.on('update', function (e) {
-                                
+                
                 console.log("update");
                 
                 dark_point_function(e);
