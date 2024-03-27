@@ -11,6 +11,25 @@
 #=========================================================================================#
 
 #-----------------------------------------------------------------------------------------#
+# running package install script
+#-----------------------------------------------------------------------------------------#
+
+# find script
+
+install_packages_loc <-
+    list.files(
+        getwd(),
+        pattern = "0-install_packages.R",
+        full.names = TRUE,
+        recursive = TRUE
+    )
+
+# run script
+
+source(install_packages_loc)
+
+
+#-----------------------------------------------------------------------------------------#
 # Loading libraries
 #-----------------------------------------------------------------------------------------#
 
@@ -232,7 +251,7 @@ nyccas_map
 
 saveWidget(
     widget = nyccas_map,
-    file = here("docs/3-raster_self-contained.html"),
+    file = here("docs/3-raster_map_self-contained.html"),
     selfcontained = TRUE,
     title = "3. Raster - Advanced"
 )
@@ -243,7 +262,7 @@ saveWidget(
 
 saveWidget(
     widget = nyccas_map,
-    file = here("docs/3-raster_non-self-contained.html"),
+    file = here("docs/3-raster_map_non-self-contained.html"),
     selfcontained = FALSE,
     title = "3. Raster - Advanced"
 )

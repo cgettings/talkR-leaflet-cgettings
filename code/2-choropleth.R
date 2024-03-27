@@ -11,6 +11,25 @@
 #=========================================================================================#
 
 #-----------------------------------------------------------------------------------------#
+# running package install script
+#-----------------------------------------------------------------------------------------#
+
+# find script
+
+install_packages_loc <-
+    list.files(
+        getwd(),
+        pattern = "0-install_packages.R",
+        full.names = TRUE,
+        recursive = TRUE
+    )
+
+# run script
+
+source(install_packages_loc)
+
+
+#-----------------------------------------------------------------------------------------#
 # Loading libraries
 #-----------------------------------------------------------------------------------------#
 
@@ -213,7 +232,7 @@ litter_baskets_map
 
 saveWidget(
     widget = litter_baskets_map,
-    file = here("docs/2-choropleth_self-contained.html"),
+    file = here("docs/2-choropleth_map_self-contained.html"),
     selfcontained = TRUE,
     title = "2. Choropleth - Intermediate"
 )
@@ -226,7 +245,7 @@ saveWidget(
 
 saveWidget(
     widget = litter_baskets_map,
-    file = here("docs/2-choropleth_non-self-contained.html"),
+    file = here("docs/2-choropleth_map_non-self-contained.html"),
     selfcontained = FALSE,
     title = "2. Choropleth - Intermediate"
 )

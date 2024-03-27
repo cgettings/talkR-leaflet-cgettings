@@ -11,32 +11,26 @@ output:
 
 # Setting up
 
-<!-- install packages -->
+<!-- Make sure you've installed all packages -->
 
-```{r install-packages, echo=FALSE}
+```{r eval=FALSE, include=FALSE}
 
-# These are the packages you already have
+# find script
 
-packages_you_have <- installed.packages()[, "Package"]
+install_packages_loc <-
+    list.files(
+        getwd(),
+        pattern = "0-install_packages.R",
+        full.names = TRUE,
+        recursive = TRUE
+    )
 
-# These are the packages we'll use in this document
+# run script
 
-packages_we_use <- c("rmarkdown", "jsonlite", "dplyr", "tibble", "tidyr", "readr", "stringr", "crosstalk", "leaflet", "leaflet.extras", "leafem", "terra", "stars", "sf", "lwgeom", "viridisLite", "here", "htmlwidgets", "htmltools", "conflicted")
-
-# These are the packages you need to install
-
-packages_you_need <- packages_we_use[!packages_we_use %in% packages_you_have]
-
-# This will install the packages you don't already have
-
-if (length(packages_you_need)) {
-    
-    cat("Installing:", paste(packages_you_need, collapse = ", "))
-    
-    install.packages(packages_you_need)
-}
+source(install_packages_loc)
 
 ```
+
 
 ## Load packages
 
@@ -402,7 +396,7 @@ In this version, all the data and dependencies are included in-line in the singl
 
 saveWidget(
     widget = light_pollution_map,
-    file = here("docs/4-light-pollution_self-contained.html"),
+    file = here("docs/4-light-pollution_map_self-contained.html"),
     selfcontained = TRUE,
     title = "4. Light pollution - Very complicated"
 )
@@ -419,7 +413,7 @@ Here, the data and dependencies are put into folders, which the HTML will point 
 
 saveWidget(
     widget = light_pollution_map,
-    file = here("docs/4-light-pollution_non-self-contained.html"),
+    file = here("docs/4-light-pollution_map_non-self-contained.html"),
     selfcontained = FALSE,
     title = "4. Light pollution - Very complicated"
 )

@@ -11,6 +11,25 @@
 #=========================================================================================#
 
 #-----------------------------------------------------------------------------------------#
+# running package install script
+#-----------------------------------------------------------------------------------------#
+
+# find script
+
+install_packages_loc <-
+    list.files(
+        getwd(),
+        pattern = "0-install_packages.R",
+        full.names = TRUE,
+        recursive = TRUE
+    )
+
+# run script
+
+source(install_packages_loc)
+
+
+#-----------------------------------------------------------------------------------------#
 # Loading libraries
 #-----------------------------------------------------------------------------------------#
 
@@ -350,7 +369,7 @@ light_pollution_map <-
 
 saveWidget(
     widget = light_pollution_map,
-    file = here("docs/4-light-pollution_self-contained.html"),
+    file = here("docs/4-light-pollution_map_self-contained.html"),
     selfcontained = TRUE,
     title = "4. Light pollution - Very complicated"
 )
@@ -364,7 +383,7 @@ saveWidget(
 
 saveWidget(
     widget = light_pollution_map,
-    file = here("docs/4-light-pollution_non-self-contained.html"),
+    file = here("docs/4-light-pollution_map_non-self-contained.html"),
     selfcontained = FALSE,
     title = "4. Light pollution - Very complicated"
 )
