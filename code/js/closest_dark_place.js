@@ -405,7 +405,7 @@ fetch(data_fl)
             
             map.on("click", function (e) {
 
-                console.log("click");
+                console.log(">> click <<");
                 
                 selected_point_function(e.latlng, georaster);
                 dark_point_function(e);
@@ -419,7 +419,7 @@ fetch(data_fl)
             
             map.on('update', function (e) {
                 
-                console.log("update");
+                console.log(">> update <<");
                 
                 dark_point_function(e);
                 
