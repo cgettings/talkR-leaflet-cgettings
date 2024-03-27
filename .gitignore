@@ -51,6 +51,9 @@ rsconnect/
 # notebook output
 
 code/*.html
+
+# files from original repo
+
 code/js/closest_dark_place_orig.js
 code/Light_Pollution_Map_orig.R
 code/light_pollution.R
@@ -86,6 +89,3 @@ code/highlight/ayu-dark.theme
 
 *~$*
 ~*
-
-Interactive maps with leaflet.zip
-Interactive maps with leaflet/
