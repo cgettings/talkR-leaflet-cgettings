@@ -89,3 +89,7 @@ code/highlight/ayu-dark.theme
 
 *~$*
 ~*
+
+# plain html entry file for GHP
+
+docs/_index.html
