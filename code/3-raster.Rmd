@@ -154,7 +154,7 @@ nyccas_map <-
     # zIndex = -1000 makes sure that the tiles are always the lowest layer
     
     addProviderTiles(
-        # provider = providers$Stadia.AlidadeSmoothDark, 
+        # provider = providers$Stadia.AlidadeSmoothDark,
         # provider = providers$CartoDB.DarkMatter, 
         provider = providers$Jawg.Matrix, 
         options = providerTileOptions(zIndex = -1000, accessToken = jawg_token),

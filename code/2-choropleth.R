@@ -98,7 +98,7 @@ time_periods <-
 
 # ==== get geo data ==== #
 
-# The `topojson_read` function from `geojsonio` returns an `sf`-classed object with a `geometry` column. This is what leaflet is going to use to create the choropleth.
+# The `read_sf` function from `sf` returns an `sf`-classed object with a `geometry` column. This is what leaflet is going to use to create the choropleth.
 
 nta_2020 <- read_sf(paste0(base_url, "geography/NTA_2020.topo.json"), crs = 4326)
 
