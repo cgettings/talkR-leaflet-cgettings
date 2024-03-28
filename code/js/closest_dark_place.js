@@ -248,12 +248,16 @@ const dark_point_function = function(e) {
     // sorting the results, so I can pull out the top [x] values
     
     results.sort(function(a, b) { return a.distance - b.distance });
+
+    console.log("results", results);
     
     
     // filtering to get those within the requested distance
     
-    let results_filtered = results.filter(results => results.distance <= distance_value);
+    let results_filtered = results.filter(results => results.distance <= (distance_value) * 1000);
     
+    console.log("results_filtered", results_filtered);
+
     
     //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
     // adding controls for # of points returned, distance to points, exposure diff
