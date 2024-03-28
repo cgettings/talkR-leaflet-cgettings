@@ -39,7 +39,8 @@ dark_point_control.addTo(map);
 let dark_point_update_button = document.querySelector("#update");
 
 dark_point_update_button.addEventListener("click", e => map.fire("update"));
- 
+
+
 //=============================================================================//
 // processing raw data
 //=============================================================================//
@@ -234,8 +235,6 @@ const dark_point_function = function(e) {
     let results = [];
     
     // looping through all filtered points to get the distance values (`push` appends an array)
-    
-    j = [];
     
     for (let j = 0; j < grid_coords_filtered.length; j++) {
         
