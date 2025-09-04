@@ -19,7 +19,7 @@
 install_packages_loc <-
     list.files(
         getwd(),
-        pattern = "0-install_packages.R",
+        pattern = "0-install-packages.R",
         full.names = TRUE,
         recursive = TRUE
     )

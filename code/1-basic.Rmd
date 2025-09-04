@@ -22,7 +22,7 @@ You can find more simple examples in the [leaflet R package docs](https://rstudi
 install_packages_loc <-
     list.files(
         getwd(),
-        pattern = "0-install_packages.R",
+        pattern = "0-install-packages.R",
         full.names = TRUE,
         recursive = TRUE
     )
